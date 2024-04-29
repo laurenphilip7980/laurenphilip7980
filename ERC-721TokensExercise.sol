@@ -17,8 +17,6 @@ interface ISubmission {
         string memory _line3
     ) external;
 
-    // function ownerOf(uint256 _id) external view returns (address);
-
     function counter() external view returns (uint256);
 
     function shareHaiku(uint256 _id, address _to) external;
@@ -35,8 +33,6 @@ contract HaikuNFT is ERC721, ISubmission {
         haikuCounter = 1;
     }
 
-    string salt = "ваша строка тут";
-
     function counter() external view override returns (uint256) {
         return haikuCounter;
     }
@@ -47,31 +43,17 @@ contract HaikuNFT is ERC721, ISubmission {
         string memory _line3
     ) external override {
         // Check if the haiku is unique
-        string[3] memory haikusStrings = [_line1, _line2, _line3];
-        for (uint256 li = 0; li < haikusStrings.length; li++) {
-            string memory newLine = haikusStrings[li];
-            // string memory newHaikuString = string(
-            //     abi.encodePacked(haikusStrings[li])
-            // );
-            for (uint256 i = 0; i < haikus.length; i++) {
-                Haiku memory existingHaiku = haikus[i];
-                string[3] memory existingHaikuStrings = [
-                    existingHaiku.line1,
-                    existingHaiku.line2,
-                    existingHaiku.line3
-                ];
-
-                for (uint256 eHsi = 0; eHsi < 3; eHsi++) {
-                    string memory existingHaikuString = existingHaikuStrings[
-                        eHsi
-                    ];
-                    if (
-                        keccak256(abi.encodePacked(existingHaikuString)) ==
-                        keccak256(abi.encodePacked(newLine))
-                    ) {
-                        revert HaikuNotUnique();
-                    }
-                }
+        for (uint256 i = 0; i < haikus.length; i++) {
+            Haiku memory existingHaiku = haikus[i];
+            if (
+                keccak256(abi.encodePacked(existingHaiku.line1)) ==
+                keccak256(abi.encodePacked(_line1)) &&
+                keccak256(abi.encodePacked(existingHaiku.line2)) ==
+                keccak256(abi.encodePacked(_line2)) &&
+                keccak256(abi.encodePacked(existingHaiku.line3)) ==
+                keccak256(abi.encodePacked(_line3))
+            ) {
+                revert HaikuNotUnique();
             }
         }
 
