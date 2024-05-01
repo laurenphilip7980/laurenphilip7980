@@ -17,8 +17,6 @@ interface ISubmission {
         string memory _line3
     ) external;
 
-    function counter() external view returns (uint256);
-
     function shareHaiku(uint256 _id, address _to) external;
 
     function getMySharedHaikus() external view returns (Haiku[] memory);
@@ -31,10 +29,6 @@ contract HaikuNFT is ERC721, ISubmission {
 
     constructor() ERC721("HaikuNFT", "HAIKU") {
         haikuCounter = 1;
-    }
-
-    function counter() external view override returns (uint256) {
-        return haikuCounter;
     }
 
     function mintHaiku(
@@ -65,10 +59,7 @@ contract HaikuNFT is ERC721, ISubmission {
 
     function shareHaiku(uint256 _id, address _to) external override {
         require(_id > 0 && _id <= haikuCounter, "Invalid haiku ID");
-
-        Haiku memory haikuToShare = haikus[_id - 1];
-        require(haikuToShare.author == msg.sender, "NotYourHaiku");
-
+        require(ownerOf(_id) == msg.sender, "Not your haiku");
         sharedHaikus[_to][_id] = true;
     }
 
@@ -85,6 +76,8 @@ contract HaikuNFT is ERC721, ISubmission {
             }
         }
 
+        require(sharedHaikuCount > 0, "No haikus shared");
+
         Haiku[] memory result = new Haiku[](sharedHaikuCount);
         uint256 currentIndex;
         for (uint256 i = 0; i < haikus.length; i++) {
@@ -94,14 +87,8 @@ contract HaikuNFT is ERC721, ISubmission {
             }
         }
 
-        if (sharedHaikuCount == 0) {
-            revert NoHaikusShared();
-        }
-
         return result;
     }
 
     error HaikuNotUnique();
-    error NotYourHaiku();
-    error NoHaikusShared();
 }
