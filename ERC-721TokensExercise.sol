@@ -14,7 +14,8 @@ interface ISubmission {
     function mintHaiku(
         string memory _line1,
         string memory _line2,
-        string memory _line3
+        string memory _line3,
+string memory _line4
     ) external;
 
     function shareHaiku(uint256 _id, address _to) external;
